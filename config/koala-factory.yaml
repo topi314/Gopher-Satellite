@@ -33,7 +33,7 @@ update:
     source: https://raw.githubusercontent.com/formatBCE/Koala-Satellite/refs/heads/main/ota/manifest.json
 
 dashboard_import:
-  package_import_url: github://formatBCE/Koala-Satellite/config/koala-dashboard.yaml
+  package_import_url: github://formatBCE/Koala-Satellite/config/koala-dashboard.yaml@main
   import_full_config: true
 
 wifi:
