@@ -5,7 +5,7 @@
 <img src="/casing/images/assembled.png" width=600 />
 
 This is the new device, based on software and (partially) hardware from [Respeaker Lite](https://github.com/formatBCE/Respeaker-Lite-ESPHome-integration) repository.
-As the software evolved and hardware needs grew, i decided to branch out this ready-to-use device from main repo.
+As the software evolved and hardware needed upgrade, i decided to branch out this ready-to-use device from main repo.
 
 _**In short, you might think of it as NabuCasa Voice PE with very similar software and possibilities, but with better internal speaker (capable even for music playback to some extent) and better LED setup.**_
 
