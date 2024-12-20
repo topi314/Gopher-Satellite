@@ -6,7 +6,7 @@
 - speaker: 2" 4Ohm 5W ([example](https://a.co/d/cEpEeNt));
 - 10x M3 screws ([i used this set](https://a.co/d/e6pNfBu));
 - 10x threaded inserts ([i used this](https://a.co/d/bMeMx9B));
-- Jst 2.0 Ph 2-Pin Connector for speaker like [this](https://a.co/d/aUkOTCS);
+- Jst 2.0 Ph 2-Pin Connector (male and female) for speaker like [this](https://a.co/d/aUkOTCS);
 - some 3-wired male-female connector for easy LED strip connection ([i used one from this kit](https://a.co/d/9OdHJpC));
 - cords of various length;
 - 4x sticky rubber pads (to isolate enclosure vibrations from surface it's standing on).
