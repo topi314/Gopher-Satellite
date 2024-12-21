@@ -10,11 +10,17 @@
 
 #### Main characteristics:
 - two far-field microphones, coupled with XMOS chip XU-316 for noise cancelation and voice recognition;
+- 16bit 48kHz audio output;
 - 5W speaker to use for speech responses, announcements, chimes or music;
 - hardware mute button;
 - rotary encoder for volume change and other adjustments;
 - LED strip for status displaying or mood lighting;
 - 3.5mm line-out jack to connect external speaker.
+
+#### Appreciation
+I'd like to thank to NabuCasa team and Home Assistan project - this project firmware is almost completely based on their work, and created for Home Assistant exclusively.
+My dedicated appreciation goes to [Voice PE](https://github.com/esphome/home-assistant-voice-pe) team, that made all of this possible.
+Also i'm thankful for continuous support from Seeed developers. We spent days debugging Respeaker Lite software. Now it works great!
 
 #### How is it different from Home Assistant [Voice PE](https://www.home-assistant.io/voice-pe)?
 They're actually pretty similar. I used PE ESPHome software as base for Koala software, and many parts are working identically.
