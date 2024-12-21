@@ -1,6 +1,6 @@
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/formatbce)
 
-# Koala-Satellite
+# Koala Satellite
 <div style="display: flex; justify-content: space-between;">
   <img src="/casing/images/assembled.png" width="400">
   <img src="/instructions/images/live_view_old.jpg" width="400">
