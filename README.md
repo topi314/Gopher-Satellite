@@ -2,8 +2,8 @@
 
 # Koala-Satellite
 <div style="display: flex; justify-content: space-between;">
-  <img src="/casing/images/assembled.png" height="800">
-  <img src="/instructions/images/live_view_old.jpg" height="800">
+  <img src="/casing/images/assembled.png" width="400">
+  <img src="/instructions/images/live_view_old.jpg" width="400">
 </div>
 
 ### Koala Satellite is DIY device that works as satellite for Home Assistant Assist.
