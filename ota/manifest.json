@@ -1,16 +1,16 @@
 {
   "name": "Koala Satellite",
-  "version": "2024.12.2",
+  "version": "2024.12.3",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "1d5eaee6e7e50354c7eeb399b3d31b9b",
+        "md5": "f88d2ba3c9b9232c4c1aec45d8690053",
         "path": "koala-ota.bin",
         "release_url": "https://github.com/formatBCE/Koala-Satellite",
-        "summary": "Test update"
+        "summary": "Changes to dashboard import. ESPHome 2024.12.2."
       }
     }
   ]
