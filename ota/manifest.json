@@ -1,13 +1,13 @@
 {
   "name": "Koala Satellite",
-  "version": "2024.12.1",
+  "version": "2024.12.2",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "35e09b7ceb7481895d50181d31912937",
+        "md5": "1d5eaee6e7e50354c7eeb399b3d31b9b",
         "path": "koala-ota.bin",
         "release_url": "https://github.com/formatBCE/Koala-Satellite",
         "summary": "Test update"
