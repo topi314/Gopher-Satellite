@@ -19,7 +19,7 @@
 
 #### Appreciation
 I'd like to thank to NabuCasa team and Home Assistant project - this project firmware is almost completely based on their work, and created for Home Assistant exclusively.
-My dedicated appreciation goes tothe  [Voice PE](https://github.com/esphome/home-assistant-voice-pe) team, that made all of this possible.
+My dedicated appreciation goes to the  [Voice PE](https://github.com/esphome/home-assistant-voice-pe) team, that made all of this possible.
 Also, i'm thankful for continuous support from Seeed developers. We spent days debugging Respeaker Lite software. Now it works great!
 
 #### How is it different from Home Assistant [Voice PE](https://www.home-assistant.io/voice-pe)?
