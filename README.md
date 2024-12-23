@@ -40,3 +40,6 @@ Yes, it is. But pretty much all exposed ESP GPIO pins are used by Respeaker in t
 Also, current configuration hides nicely USB power cable (which is also ESP32 data cable), and allows exposing RESET/BOOT buttons for flashing.
 
 ### [Here's how you make one for yourself.](/instructions/assembly.md)
+
+### What if i don't want or cannot build it myself?
+Create issue in this repository to let me know, that you need fully assembled device (or just printed enclosure for it). I will consider selling if demand is there. :)
