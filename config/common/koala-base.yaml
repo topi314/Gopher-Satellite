@@ -18,11 +18,11 @@ substitutions:
 esphome:
   project: 
     name: formatbce.koala_satellite
-    version: 2024.12.0
+    version: 2024.12.7
   name: koala-satellite
   friendly_name: Koala Satellite
-  name_add_mac_suffix: false
-  min_version: 2024.12.0
+  name_add_mac_suffix: true
+  min_version: 2024.12.2
   platformio_options:
     board_build.flash_mode: dio
   on_boot:
@@ -89,6 +89,8 @@ esp32:
       CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
       CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
 
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+
 wifi:
   id: wifi_id
   on_connect:
@@ -117,7 +119,7 @@ i2c:
   - id: internal_i2c
     sda: GPIO5
     scl: GPIO6
-    scan: true
+    frequency: 400kHz
 
 psram:
   mode: octal
@@ -803,6 +805,11 @@ sensor:
                 id: control_hue
                 increase_hue: false
 
+text_sensor:
+  - platform: template
+    id: tts_uri
+    name: "TTS URI"
+
 event:
   # Event entity exposed to the user to automate on complex center button presses.
   # The simple press is not exposed as it is used to control the device itself.
@@ -1427,6 +1434,11 @@ voice_assistant:
     - script.execute: control_leds
     # Start a script that would potentially enable the stop word if the response is longer than a second
     - script.execute: activate_stop_word_if_tts_step_is_long
+  on_tts_end:
+    - text_sensor.template.publish:
+        id: tts_uri
+        state: !lambda 'return x;'
+    
   # When the voice assistant ends ...
   on_end:
     - wait_until:
