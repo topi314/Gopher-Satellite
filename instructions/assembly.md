@@ -39,7 +39,7 @@ You may find STEP files for 3D-printing [here](/casing/step).
   - `CLK` -> `GPIO47`
   - `DT` -> `GPIO21`
 - Solder all Respeaker Lite pins to the ESP board. This will take some time.
-  Pinout: _TODO_
+  - Check pinout on [this image](images/respeaker-esp-pinout.jpg).
 #### At this stage, you can [install the firmware](software.md), connect the peripherals and check that everything works.
 
 ### Final assembly process
