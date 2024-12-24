@@ -13,13 +13,6 @@ packages:
         - ble.enable:
   koala-satellite: !include common/koala-base.yaml
 
-external_components:
-    # TODO remove when merged (fix for Improv bug in ESPHome)
-  - source: "github://pr#7984"
-    components: 
-      - esp32_ble
-    refresh: 0s
-
 ota:
   - platform: http_request
     id: ota_http_request
@@ -34,7 +27,7 @@ update:
 
 dashboard_import:
   package_import_url: github://formatBCE/Koala-Satellite/config/koala-dashboard.yaml@main
-  import_full_config: true
+  import_full_config: false
 
 wifi:
   on_connect:
