@@ -16,8 +16,9 @@ There's two configurations available: [dashboard](/config/koala-dashboard.yaml) 
 2. Build the firmware with ESPHome and flash it with your method of choice.
 
 ### Connecting to Home Assistant
-I'm sure you already know how to connect ESPHome devices to Home Assistant. If it's your first time, please check the [official documentation](https://www.home-assistant.io/integrations/esphome/).
-In case of Factory firmware you will need to connect the device to the WiFi first. Check [Improv docs](https://www.home-assistant.io/integrations/improv_ble/) for details.
-The voice satellite onboarding wizard will help you setup the pipeline and wake word.
+- I'm sure you already know how to connect ESPHome devices to Home Assistant. If it's your first time, please check the [official documentation](https://www.home-assistant.io/integrations/esphome/).
+- In case of Factory firmware you will need to connect the device to the WiFi first. Check [Improv docs](https://www.home-assistant.io/integrations/improv_ble/) for details.
+_**(When asked to authorize by pressing button on device, use small round button!)**_
+- The voice satellite onboarding wizard will help you setup the pipeline and wake word.
 
 ### _Happy tinkering!_
