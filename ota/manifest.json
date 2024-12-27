@@ -1,13 +1,13 @@
 {
   "name": "Koala Satellite",
-  "version": "2024.12.8",
+  "version": "2024.12.9",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "1f3a3b99372004226a80ce6a6726fb80",
+        "md5": "0a1055bfb8e9343fb306a4b21153e788",
         "path": "koala-ota.bin",
         "release_url": "https://github.com/formatBCE/Koala-Satellite",
         "summary": "Added TTS URI sensor"
