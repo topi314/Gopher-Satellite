@@ -5,7 +5,7 @@ Your Respeaker Lite board comes pre-flashed with some software. However, most pr
 
 To flash Respeaker board with correct software, you can use [included sowtware](/respeaker_lite_i2s_dfu_firmware_48k_v1.0.9.bin) (or take same one from [official repo](https://github.com/respeaker/ReSpeaker_Lite/tree/master/xmos_firmwares)) and [instructions from Seeed site](https://wiki.seeedstudio.com/xiao_respeaker/#flash-the-i2s-firmware).
 
-#### _Please re-insert the board after flash and make sure that dosplayed version is correct one._
+#### _Please re-insert the board after flash and make sure that displayed version is correct one._
 
 ### Flashing ESPHome configuration to ESP32-S3 board
 There's two configurations available: [dashboard](/config/koala-dashboard.yaml) and [factory](/config/koala-factory.yaml). Also you will need to copy [base config YAML](/config/common/koala-base.yaml) into `common` directory in your ESPHome root folder. Alternatively, you can copy everything from `koala-base.yaml` to the chosen config and merge everything inside.
