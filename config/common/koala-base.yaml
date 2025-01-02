@@ -17,7 +17,7 @@ substitutions:
 
 esphome:
   project: 
-    name: formatbce.koala_satellite
+    name: formatbce.Koala Satellite
     version: 2024.12.7
   name: koala-satellite
   friendly_name: Koala Satellite
