@@ -28,6 +28,9 @@ esphome:
   on_boot:
     priority: 375
     then:
+      - sensor.template.publish:
+          id: next_timer
+          state: -1
       # Run the script to refresh the LED status
       - script.execute: control_leds
       # If after 10 minutes, the device is still initializing (It did not yet connect to Home Assistant), turn off the init_in_progress variable and run the script to refresh the LED status
@@ -90,6 +93,7 @@ esp32:
       CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
 
       CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"  # TLS1.3 support isn't enabled by default in IDF 5.1.5
 
 wifi:
   id: wifi_id
@@ -117,6 +121,10 @@ api:
     - script.execute: control_leds
   on_client_disconnected:
     - script.execute: control_leds
+
+# Uncomment this, if you have problems with text-to-speech because of Home Assistant HTTPS internal URL
+# http_request:
+#   verify_ssl: false
 
 ota:
   - platform: esphome
@@ -213,7 +221,9 @@ switch:
     on_turn_on:
       - if:
           condition:
-            lambda: return !id(init_in_progress);
+            and:
+              - lambda: return !id(init_in_progress);
+              - switch.is_on: mute_sound
           then:
             - script.execute:
                 id: play_sound
@@ -222,7 +232,9 @@ switch:
     on_turn_off:
       - if:
           condition:
-            lambda: return !id(init_in_progress);
+            and:
+              - lambda: return !id(init_in_progress);
+              - switch.is_on: mute_sound
           then:
             - script.execute:
                 id: play_sound
@@ -232,6 +244,22 @@ switch:
       - switch.turn_on: mute_toggle
     turn_off_action:
       - switch.turn_on: mute_toggle
+  # Button click Sounds Switch.
+  - platform: template
+    id: button_sound
+    name: Button click sounds
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+  # Mute Sound Switch.
+  - platform: template
+    id: mute_sound
+    name: Mute/unmute sound
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
   # Wake Word Sound Switch.
   - platform: template
     id: wake_sound
@@ -282,6 +310,7 @@ switch:
       - switch.turn_off: timer_ringing
 
 binary_sensor:
+  # User Button. Used for many things (See on_multi_click)
   - platform: gpio
     id: user_button
     pin:
@@ -350,11 +379,15 @@ binary_sensor:
                                                 - not:
                                                     voice_assistant.is_running
                                             then:
-                                              - script.execute:
-                                                  id: play_sound
-                                                  priority: true
-                                                  sound_file: !lambda return id(center_button_press_sound);
-                                              - delay: 300ms
+                                              - if:
+                                                  condition:
+                                                    switch.is_on: button_sound
+                                                  then:
+                                                    - script.execute:
+                                                        id: play_sound
+                                                        priority: true
+                                                        sound_file: !lambda return id(center_button_press_sound);
+                                                    - delay: 300ms
                                               - voice_assistant.start:
       # Double Click
       #  . Exposed as an event entity. To be used in automations inside Home Assistant
@@ -368,10 +401,14 @@ binary_sensor:
               condition:
                 lambda: return !id(init_in_progress) && !id(color_changed);
               then:
-                - script.execute:
-                    id: play_sound
-                    priority: false
-                    sound_file: !lambda return id(center_button_double_press_sound);
+                - if:
+                    condition:
+                      switch.is_on: button_sound
+                    then:
+                      - script.execute:
+                          id: play_sound
+                          priority: false
+                          sound_file: !lambda return id(center_button_double_press_sound);
                 - event.trigger:
                     id: button_press_event
                     event_type: "double_press"
@@ -389,10 +426,14 @@ binary_sensor:
               condition:
                 lambda: return !id(init_in_progress) && !id(color_changed);
               then:
-                - script.execute:
-                    id: play_sound
-                    priority: false
-                    sound_file: !lambda return id(center_button_triple_press_sound);
+                - if:
+                    condition:
+                      switch.is_on: button_sound
+                    then:
+                      - script.execute:
+                          id: play_sound
+                          priority: false
+                          sound_file: !lambda return id(center_button_triple_press_sound);
                 - event.trigger:
                     id: button_press_event
                     event_type: "triple_press"
@@ -405,10 +446,14 @@ binary_sensor:
               condition:
                 lambda: return !id(init_in_progress) && !id(color_changed);
               then:
-                - script.execute:
-                    id: play_sound
-                    priority: false
-                    sound_file: !lambda return id(center_button_long_press_sound);
+                - if:
+                    condition:
+                      switch.is_on: button_sound
+                    then:
+                      - script.execute:
+                          id: play_sound
+                          priority: false
+                          sound_file: !lambda return id(center_button_long_press_sound);
                 - light.turn_off: voice_assistant_leds
                 - event.trigger:
                     id: button_press_event
@@ -811,11 +856,25 @@ sensor:
             - script.execute:
                 id: control_hue
                 increase_hue: false
+  - platform: template
+    id: next_timer
+    name: "Next timer"
+    update_interval: never
+    disabled_by_default: true
+    device_class: duration
+    unit_of_measurement: s
+    icon: "mdi:timer"
 
 text_sensor:
   - platform: template
+    id: next_timer_name
+    name: "Next timer name"
+    icon: "mdi:timer"
+    disabled_by_default: true
+  - platform: template
     id: tts_uri
     name: "TTS URI"
+    disabled_by_default: true
 
 event:
   # Event entity exposed to the user to automate on complex center button presses.
@@ -953,7 +1012,7 @@ script:
           id: voice_assistant_leds
           effect: "Thinking"
 
-  # Script executed when the voice assistant is thinking to a command
+  # Script executed when the voice assistant is replying to a command
   # Fast anticlockwise spin of the LED ring.
   - id: control_leds_voice_assistant_replying_phase
     then:
@@ -1332,6 +1391,9 @@ external_components:
     components: 
       - respeaker_lite
     refresh: 0s
+  - source: github://pr#8018
+    components: [http_request]
+    refresh: 0s
 
 audio_dac:
   - platform: aic3204
@@ -1340,8 +1402,9 @@ audio_dac:
 micro_wake_word:
   id: mww
   models:
-    - model: https://github.com/kahrendt/microWakeWord/releases/download/okay_nabu_20241205.4/okay_nabu.json
-      probability_cutoff: 0.8
+    - model: https://github.com/kahrendt/microWakeWord/releases/download/okay_nabu_20241223.2/okay_nabu.json
+      # Use this to adjust sensitivity for the wake word
+      # probability_cutoff: 0.8
       id: okay_nabu
     - model: hey_jarvis
       id: hey_jarvis
@@ -1474,14 +1537,31 @@ voice_assistant:
     - script.execute: control_leds
   on_timer_finished:
     - switch.turn_on: timer_ringing
+    - lambda: |
+        id(next_timer).publish_state(-1);
+        id(next_timer_name).publish_state("-");
   on_timer_started:
     - script.execute: control_leds
+    - lambda: |
+        id(next_timer).publish_state(id(first_active_timer).seconds_left);
+        id(next_timer_name).publish_state(id(first_active_timer).name);
   on_timer_cancelled:
     - script.execute: control_leds
+    - lambda: |
+        id(next_timer).publish_state(id(first_active_timer).seconds_left);
+        id(next_timer_name).publish_state(id(first_active_timer).name);
   on_timer_updated:
     - script.execute: control_leds
+    - lambda: |
+        id(next_timer).publish_state(id(first_active_timer).seconds_left);
+        id(next_timer_name).publish_state(id(first_active_timer).name);
   on_timer_tick:
     - script.execute: control_leds
+    - lambda: | 
+        int seconds_left = id(first_active_timer).seconds_left;
+        if (std::abs(seconds_left) % 5 == 0) {
+          id(next_timer).publish_state(seconds_left); 
+        }
 
 button:
   - platform: factory_reset
