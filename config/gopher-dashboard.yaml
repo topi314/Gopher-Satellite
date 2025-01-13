@@ -2,16 +2,15 @@ packages:
   gopher-satellite: !include
     file: common/gopher-base.yaml
     vars:
-      # media player entity id of this device
+      # music assistant media player entity id of this device
       media_player_entity_id: "media_player.gopher_satellite_1_media_player_2"
-      # if the display should be flipped horizontally
       display_flip_x: false
-      # if the display should be flipped vertically
       display_flip_y: false
 
 esphome:
   name: gopher-satellite
   friendly_name: Gopher Satellite
+  name_add_mac_suffix: false
 
 wifi:
   ap:
