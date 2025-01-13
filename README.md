@@ -38,6 +38,8 @@ So i started thinking on real device. Here it is.
 #### Why not use [Respeaker Lite with pre-soldered XIAO ESP32-S3 board](https://www.seeedstudio.com/ReSpeaker-Lite-Voice-Assistant-Kit-p-5929.html)? Isn't that easier and cheaper?
 Yes, it is. But pretty much all exposed ESP GPIO pins are used by Respeaker in that configuration. So there's no way to use more elements like rotary or LED strip.
 Also, current configuration hides nicely USB power cable (which is also ESP32 data cable), and allows exposing RESET/BOOT buttons for flashing.
+If you're using pre-soldered version, you may check [this PR by @rananna](https://github.com/formatBCE/Koala-Satellite/pull/5) _(Thank you!)_.
+Or even go full bananas and use it without dedicated LED strip (top LED should work okay) - just adjust LED diffuser color to your like.
 
 ### [Here's how you make one for yourself.](/instructions/assembly.md)
 
