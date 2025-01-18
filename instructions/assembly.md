@@ -8,7 +8,11 @@ Same goes to ESP32-S3 board. Make sure it has sticking antenna - the casing made
 
 ### Prepare the casing
 Take a look at [images folder](/casing/images) to check how it looks in detail.
-You may find STEP files for 3D-printing [here](/casing/step).
+You may find files for 3D-printing here:
+  - [STEP](/casing/step);
+  - [STL](/casing/stl) (by @systemik);
+  - [3MF](/casing/3mf) (by @systemik).
+
 _HINT: If you print with dark/non-translucent filament, consider printing face plate for top LED cover, and print top LED cover in white/clear filament to make mute LED and Respeaker LED visible. Otherwise just print regular face plate - it has thin layer that will make them visible._
 
 #### Some tips and tricks on printing:
