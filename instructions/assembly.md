@@ -28,7 +28,7 @@ _HINT: If you print with dark/non-translucent filament, consider printing face p
 - Use rubber pads for casing legs. It will greatly reduce vibrations and will make sound undisputably better!
 
 ### Prepare guts
-- Bridge buttons on Respeaker Lite to corresponding pins (`USR` to `D2`, `Mute` to `D3`).
+- Bridge buttons on Respeaker Lite to corresponding pins (`USR` to `D2`, `Mute` to `D3`). _**ATTENTION! This step is mandatory, as without it the buttons on Koala won't work as intended.**_
 - Bridge `IN-OUT` and `RGB` with solder on ESP board.
 - Solder the male Jst 2.0 Ph 2-Pin Connector to the speaker. Keep the cable short, ~3cm.
 - Solder the female Jst 2.0 Ph 2-Pin Connector to the Respeaker Lite. You will find corresponding pads on Respeaker board near the soldered JST connector (marked + and -). Check the cables polarity. Make the cable long, so it sticks from the bottom of main casing, when Respeaker is on top (~12cm).
