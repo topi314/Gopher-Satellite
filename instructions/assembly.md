@@ -18,7 +18,7 @@ _HINT: If you print with dark/non-translucent filament, consider printing face p
 #### Some tips and tricks on printing:
 - Use as much infill as you can for main casing, speaker plate and face plate. Ideally, make it 100%. This will make sound better, and ensure you don't have broken parts (especially with face plate).
 - Use tree supports for main casing and speaker plate. Place supports on build plate only.
-- Print rotary with fuzzy skin option. It looks way better than usual sim.
+- Print rotary with fuzzy skin option. It looks way better than usual seam.
 - Print LED diffuser with white plastic, with ~40% infill. More infill will diffuse light better, but lower the brightness.
 - Clean bottom part of main casing with prints cleaning tool. It has the pocket for LED diffuser to slide into (that was made to make LED strip look thinner than it is). Make sure bottom is clean and smooth.
 - Place threaded inserts into prepared holes:
