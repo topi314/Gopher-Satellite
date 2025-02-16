@@ -14,6 +14,8 @@ substitutions:
   voice_assist_not_ready_phase_id: '10'
   # The voice assistant encountered an error
   voice_assist_error_phase_id: '11'
+  # Change this to true in case you ahve a hidden SSID at home.
+  hidden_ssid: "false"
 
 esphome:
   project: 
@@ -97,6 +99,7 @@ esp32:
 
 wifi:
   id: wifi_id
+  fast_connect: ${hidden_ssid}
   on_connect:
     - lambda: id(improv_ble_in_progress) = false;
     - script.execute: control_leds
@@ -1479,6 +1482,7 @@ voice_assistant:
           and:
             - lambda: return !id(init_in_progress);
             - lambda: return code != "duplicate_wake_up_detected";
+            - lambda: return code != "stt-no-text-recognized";
         then:
           - lambda: id(voice_assistant_phase) = ${voice_assist_error_phase_id};
           - script.execute: control_leds
