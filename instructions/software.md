@@ -8,6 +8,11 @@ To flash Respeaker board with correct software, you can use [included sowtware](
 #### _Please re-insert the board after flash and make sure that displayed version is correct one._
 
 ### Flashing ESPHome configuration to ESP32-S3 board
+
+#### Factory flashing
+Use the [prebuilt `.bin` file](/koala-factory-2025.2.0.bin) if you want to install it, and get "official" updates right in your Home Assistant. The logic is the same as for **Factory YAML** below. Just download and flash with tool like https://web.esphome.io.
+
+#### Manual building with ESPHome
 There's two configurations available: [dashboard](/config/koala-dashboard.yaml) and [factory](/config/koala-factory.yaml). Also you will need to copy [base config YAML](/config/common/koala-base.yaml) into `common` directory in your ESPHome root folder. Alternatively, you can copy everything from `koala-base.yaml` to the chosen config and merge everything inside.
 
 1. Pick your config:
