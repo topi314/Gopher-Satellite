@@ -1,16 +1,16 @@
 {
   "name": "Koala Satellite",
-  "version": "2025.1.2",
+  "version": "2025.2.0",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "1c1aaebbbb5a702962215fc2d30d32a6",
+        "md5": "e52323826c9f4bdb3da05c2a49b5ce60",
         "path": "koala-ota.bin",
         "release_url": "https://github.com/formatBCE/Koala-Satellite",
-        "summary": "Added TTS URI sensor"
+        "summary": "Changes related to 2025.2.0. More stable LED work. Changed animations."
       }
     }
   ]
