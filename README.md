@@ -45,3 +45,9 @@ Or even go full bananas and use it without dedicated LED strip (top LED should w
 
 ### What if i don't want or cannot build it myself?
 Create issue in this repository to let me know, that you need fully assembled device (or just printed enclosure for it). I will consider selling if demand is there. :)
+
+### Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=formatBCE/Koala-Satellite,formatBCE/Respeaker-Lite-ESPHome-integration&type=Date)](https://star-history.com/#formatBCE/Koala-Satellite&formatBCE/Respeaker-Lite-ESPHome-integration&Date)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/formatbce)
