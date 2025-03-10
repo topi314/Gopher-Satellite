@@ -6,6 +6,7 @@ packages:
       media_player_entity_id: "media_player.gopher_satellite_1_media_player_2"
       display_flip_x: false
       display_flip_y: false
+      fast_connect: false
 
 esphome:
   name: gopher-satellite
