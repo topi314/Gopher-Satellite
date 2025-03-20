@@ -22,7 +22,7 @@ esphome:
   name: gopher-satellite
   friendly_name: Gopher Satellite
   name_add_mac_suffix: true
-  min_version: 2025.2.0
+  min_version: 2025.3.0
   platformio_options:
     board_build.flash_mode: dio
   on_boot:
@@ -460,6 +460,7 @@ sensor:
     id: dial
     pin_a: GPIO47
     pin_b: GPIO21
+    resolution: 1
     on_clockwise:
       - if:
           condition:
@@ -705,17 +706,17 @@ script:
           then:
             - light.turn_on:
                 brightness: 50%
-                red: 9.4%
-                green: 73.3%
-                blue: 94.9%
+                red: 9%
+                green: 73%
+                blue: 95%
                 id: led_speaker
                 effect: "Fast pulse"
           else:
             - light.turn_on:
                 brightness: 50%
-                red: 9.4%
-                green: 73.3%
-                blue: 94.9%
+                red: 9%
+                green: 73%
+                blue: 95%
                 id: led_speaker
                 effect: "Slow Pulse"
   # Script executed when the device has no connection to Home Assistant
@@ -1062,7 +1063,7 @@ speaker:
 media_player:
   - platform: speaker
     id: external_media_player
-    name: Media Player
+    name: None
     internal: false
     volume_increment: 0.05
     volume_min: 0.2
@@ -1212,6 +1213,7 @@ micro_wake_word:
       id: stop
       internal: true
   vad:
+    probability_cutoff: 0.05
   microphone: nabu_mic_mww
   on_wake_word_detected:
     # If the wake word is detected when the device is muted (Possible with the software mute switch): Do nothing
