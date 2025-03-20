@@ -251,7 +251,7 @@ switch:
       # If 15 minutes have passed and the timer is still ringing, stop it.
       - delay: 15min
       - switch.turn_off: timer_ringing
-  # Internal switch to track if the device is sleeping (ie: the screen is off)
+  # Internal switch to track if the device is sleeping (ie: the screen is off & the speaker is muted)
   - platform: template
     id: sleep_mode_switch
     name: "Sleep mode"
@@ -261,8 +261,10 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
     on_turn_on:
       - display.page.show: sleep_page
+      - switch.turn_on: speaker_mute_switch
     on_turn_off:
       - display.page.show: main_page
+      - switch.turn_off: speaker_mute_switch
 
 binary_sensor:
   # User Button. Used to control the device and trigger the voice assistant.
