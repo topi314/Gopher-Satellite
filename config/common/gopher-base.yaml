@@ -1489,6 +1489,8 @@ display:
             icon_x += 14;
           }
 
+          it.strftime(128, 0, id(font_12), TextAlign::TOP_RIGHT, "%H:%M", id(ha_time).now());
+
           if (id(current_media_type).state == "music" && (id(ha_media_player).state == "playing" || id(ha_media_player).state == "paused")) {
             if (id(ha_media_player).state == "paused") {
               it.print(icon_x, 0, id(icons), "\U0000e034");
