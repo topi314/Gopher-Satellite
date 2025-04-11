@@ -48,6 +48,6 @@ Create issue in this repository to let me know, that you need fully assembled de
 
 ### Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=formatBCE/Koala-Satellite,formatBCE/Respeaker-Lite-ESPHome-integration&type=Date)](https://www.star-history.com/#formatBCE/Koala-Satellite&formatBCE/Respeaker-Lite-ESPHome-integration&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=formatBCE/Koala-Satellite,formatBCE/Respeaker-Lite-ESPHome-integration&type=Date)](https://www.star-history.com/#formatBCE/Koala-Satellite&formatBCE/Respeaker-Lite-ESPHome-integration&Date?target="_blank")
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/formatbce)
