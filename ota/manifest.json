@@ -9,7 +9,7 @@
       "ota": {
         "md5": "e306891274fd593509468192260bdebc",
         "path": "koala-ota.bin",
-        "release_url": "https://github.com/formatBCE/Koala-Satellite",
+        "release_url": "https://github.com/formatBCE/Koala-Satellite/releases/tag/2025.4.2",
         "summary": "Fix for non-set alarm crash. Some PE improvements. STT event added."
       }
     }
