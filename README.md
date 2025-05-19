@@ -50,6 +50,11 @@ Or even go full bananas and use it without dedicated LED strip (top LED should w
 
 ### [Here's how you make one for yourself.](/instructions/assembly.md)
 
+### Check main abilities [here on Respeaker repository](https://github.com/formatBCE/Respeaker-Lite-ESPHome-integration/tree/main?tab=readme-ov-file#current-abilities) - they're identical
+
 ### What if i don't want or cannot build it myself?
 
 Create issue in this repository to let me know, that you need fully assembled device (or just printed enclosure for it). I will consider selling if demand is there. :)
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/formatbce)
