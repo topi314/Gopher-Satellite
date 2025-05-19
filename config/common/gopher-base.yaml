@@ -849,12 +849,12 @@ script:
             - media_player.volume_up:
           else:
             - media_player.volume_down:
+      - script.execute: update_display
+      - script.execute: control_leds
       - delay: 1s
       - sensor.rotary_encoder.set_value:
           id: dial
           value: 0
-      - script.execute: update_display
-      - script.execute: control_leds
 
   # Script executed when the play/pause button is pressed
   - id: control_media_player_play_pause
