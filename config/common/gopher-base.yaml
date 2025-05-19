@@ -18,33 +18,44 @@ substitutions:
 esphome:
   project:
     name: topi314.Gopher Satellite
-    version: 2025.1.0
+    version: 2025.4.0
   name: gopher-satellite
   friendly_name: Gopher Satellite
   name_add_mac_suffix: true
-  min_version: 2025.3.0
+  min_version: 2025.3.3
   platformio_options:
     board_build.flash_mode: dio
   on_boot:
-    priority: 375
-    then:
-      # Reset next timer and next timer name
-      - sensor.template.publish:
-          id: next_timer
-          state: -1
-      - text_sensor.template.publish:
-          id: next_timer_name
-          state: "-1"
-      # Run the script to refresh the LED status
-      - script.execute: control_leds
-      # If after 10 minutes, the device is still initializing (It did not yet connect to Home Assistant), turn off the init_in_progress variable and run the script to refresh the LED status
-      - delay: 10min
-      - if:
-          condition:
-            lambda: return id(init_in_progress);
-          then:
-            - lambda: id(init_in_progress) = false;
-            - script.execute: control_leds
+    - priority: 375
+      then:
+        # Reset next timer and next timer name
+        - sensor.template.publish:
+            id: next_timer
+            state: -1
+        - text_sensor.template.publish:
+            id: next_timer_name
+            state: "-1"
+        # Run the script to refresh the LED status
+        - script.execute: control_leds
+        # If after 10 minutes, the device is still initializing (It did not yet connect to Home Assistant), turn off the init_in_progress variable and run the script to refresh the LED status
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
+              - script.execute: control_leds
+    - priority: -100
+      then:
+        - lambda: |-
+            id(alarm_time).publish_state(id(saved_alarm_time));
+        - lambda: |-
+            auto call = id(alarm_action).make_call();
+            call.set_option(id(saved_alarm_action));
+            call.perform();
+        - lambda: |-
+            setenv("TZ", id(saved_time_zone).c_str(), 1);
+            tzset();
   on_shutdown:
     then:
       # Prevent loud noise on software restart
@@ -81,9 +92,30 @@ wifi:
 
 logger:
   level: debug
+  initial_level: debug
   logs:
     sensor: WARN # avoids logging debug sensor updates
-#  hardware_uart: uart0  #Uncomment to see serial logs via USB connection. Comment out after debufgging - this line introduces noise on speaker...
+  hardware_uart: uart0 #Uncomment to see serial logs via USB connection. Comment out after debufgging - this line introduces noise on speaker...
+
+select:
+  - platform: logger
+    id: logger_select
+    name: Logger Level
+    disabled_by_default: true
+  - platform: template
+    optimistic: true
+    name: "Alarm action"
+    id: alarm_action
+    icon: mdi:bell-plus
+    options:
+      - "Play sound"
+      - "Send event"
+      - "Sound and event"
+    initial_option: "Play sound"
+    on_value:
+      then:
+        - lambda: |-
+            id(saved_alarm_action) = x;
 
 debug:
   update_interval: 5s
@@ -97,6 +129,26 @@ api:
     - action: stop_va
       then:
         - voice_assistant.stop
+    - action: set_alarm_time
+      variables:
+        alarm_time_hh_mm: string
+      then:
+        - lambda: |-
+            if (alarm_time_hh_mm.length() == 5 &&
+              isdigit(alarm_time_hh_mm[0]) && isdigit(alarm_time_hh_mm[1]) &&
+              isdigit(alarm_time_hh_mm[3]) && isdigit(alarm_time_hh_mm[4])) {
+                id(alarm_time).publish_state(alarm_time_hh_mm);
+                id(saved_alarm_time) = alarm_time_hh_mm;
+              }
+    - action: set_time_zone
+      variables:
+        posix_time_zone: string
+      then:
+        - lambda: |-
+            setenv("TZ", posix_time_zone.c_str(), 1);
+            tzset();
+            id(saved_time_zone) = posix_time_zone;
+            id(publish_current_time).execute();
   on_client_connected:
     - script.execute: control_leds
   on_client_disconnected:
@@ -128,13 +180,27 @@ globals:
   # Global initialization variable. Initialized to true and set to false once everything is connected. Only used to have a smooth "plugging" experience
   - id: init_in_progress
     type: bool
-    restore_value: no
+    restore_value: false
     initial_value: "true"
   # Global variable tracking the phase of the voice assistant (defined above). Initialized to not_ready
   - id: voice_assistant_phase
     type: int
-    restore_value: no
+    restore_value: false
     initial_value: ${voice_assist_not_ready_phase_id}
+  - id: saved_alarm_time
+    type: std::string
+    restore_value: true
+    initial_value: '"Unknown"'
+  # Global variable storing the time zone
+  - id: saved_time_zone
+    type: std::string
+    restore_value: true
+    initial_value: '"UTC0"'
+  # Global variable storing the alarm action
+  - id: saved_alarm_action
+    type: std::string
+    restore_value: true
+    initial_value: '"Play sound"'
   # Global variable storing the first active timer
   - id: first_active_timer
     type: voice_assistant::Timer
@@ -147,6 +213,19 @@ globals:
   - id: current_ringing_timer
     type: voice_assistant::Timer
     restore_value: false
+
+# Time sync from Home Assistant
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      # Every 1 minute
+      - seconds: 0
+        minutes: /1
+        then:
+          - script.execute: check_alarm
+    on_time_sync:
+      - script.execute: publish_current_time
 
 switch:
   # Hardware speaker mute
@@ -251,6 +330,13 @@ switch:
       # If 15 minutes have passed and the timer is still ringing, stop it.
       - delay: 15min
       - switch.turn_off: timer_ringing
+  # Defines if alarm is active
+  - platform: template
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    id: alarm_on
+    icon: mdi:bell-badge
+    name: "Alarm on"
   # Internal switch to track if the device is sleeping (ie: the screen is off & the speaker is muted)
   - platform: template
     id: sleep_mode_switch
@@ -260,11 +346,11 @@ switch:
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF
     on_turn_on:
-      - display.page.show: sleep_page
       - switch.turn_on: speaker_mute_switch
+      - lambda: id(oled_display).turn_off();
     on_turn_off:
-      - display.page.show: main_page
       - switch.turn_off: speaker_mute_switch
+      - lambda: id(oled_display).turn_on();
 
 binary_sensor:
   # User Button. Used to control the device and trigger the voice assistant.
@@ -273,16 +359,9 @@ binary_sensor:
     pin:
       number: GPIO42
       inverted: true
-    on_press:
-      - script.execute: control_leds
     on_multi_click:
       # Simple Click:
-      #   - Abort "things" in order
-      #     - Timer
-      #     - Announcements
-      #     - Voice Assistant Pipeline run
-      #     - Music
-      #   - Starts the voice assistant if it is not yet running and if the device is not muted.
+      # Toggle the sleep mode (Mute the speaker and turn off the screen)
       - timing:
           - ON for at most 1s
           - OFF for at least 0.25s
@@ -291,43 +370,7 @@ binary_sensor:
               condition:
                 lambda: return !id(init_in_progress);
               then:
-                - if:
-                    condition:
-                      switch.is_on: timer_ringing
-                    then:
-                      - switch.turn_off: timer_ringing
-                    else:
-                      - if:
-                          condition:
-                            media_player.is_announcing:
-                          then:
-                            media_player.stop:
-                              announcement: true
-                          else:
-                            - if:
-                                condition:
-                                  voice_assistant.is_running:
-                                then:
-                                  - voice_assistant.stop:
-                                else:
-                                  - if:
-                                      condition:
-                                        media_player.is_playing:
-                                      then:
-                                        - media_player.pause:
-                                      else:
-                                        - if:
-                                            condition:
-                                              and:
-                                                - switch.is_off: mic_mute_switch
-                                                - not: voice_assistant.is_running
-                                            then:
-                                              - script.execute:
-                                                  id: play_sound
-                                                  priority: true
-                                                  sound_file: !lambda return id(center_button_press_sound);
-                                              - delay: 300ms
-                                              - voice_assistant.start:
+                - switch.toggle: sleep_mode_switch
       # Double Click
       # Exposed as an event entity. To be used in automations inside Home Assistant
       - timing:
@@ -344,6 +387,7 @@ binary_sensor:
                     id: play_sound
                     priority: false
                     sound_file: !lambda return id(center_button_double_press_sound);
+                - light.turn_off: led_speaker
                 - event.trigger:
                     id: button_press_event
                     event_type: "double_press"
@@ -369,7 +413,11 @@ binary_sensor:
                     id: button_press_event
                     event_type: "triple_press"
       # Long Press
-      # Exposed as an event entity. To be used in automations inside Home Assistant
+      # Abort "things" in order
+      #   - Timer
+      #   - Announcements
+      #   - Voice Assistant Pipeline run
+      #   - Music
       - timing:
           - ON for at least 1s
         then:
@@ -377,14 +425,30 @@ binary_sensor:
               condition:
                 lambda: return !id(init_in_progress);
               then:
-                - script.execute:
-                    id: play_sound
-                    priority: false
-                    sound_file: !lambda return id(center_button_long_press_sound);
-                - light.turn_off: led_speaker
-                - event.trigger:
-                    id: button_press_event
-                    event_type: "long_press"
+                - if:
+                    condition:
+                      switch.is_on: timer_ringing
+                    then:
+                      - switch.turn_off: timer_ringing
+                    else:
+                      - if:
+                          condition:
+                            voice_assistant.is_running:
+                          then:
+                            - voice_assistant.stop:
+                          else:
+                            - if:
+                                condition:
+                                  media_player.is_announcing:
+                                then:
+                                  media_player.stop:
+                                    announcement: true
+                                else:
+                                  - if:
+                                      condition:
+                                        media_player.is_playing:
+                                      then:
+                                        - media_player.pause:
   # Rotary Button. Used to navigate the settings menu and control the music player.
   - platform: gpio
     id: rotary_button
@@ -517,6 +581,16 @@ text_sensor:
     name: "Next timer name"
     icon: "mdi:timer"
 
+  - platform: template
+    name: "Alarm time"
+    id: alarm_time
+    icon: mdi:bell-ring
+
+  - platform: template
+    name: "Current device time"
+    id: current_time
+    icon: mdi:clock
+
   - platform: homeassistant
     id: ha_media_player
     entity_id: ${media_player_entity_id}
@@ -644,7 +718,6 @@ event:
     event_types:
       - double_press
       - triple_press
-      - long_press
 
   - platform: template
     id: rotary_button_press_event
@@ -670,8 +743,6 @@ script:
             id(control_leds_init_state).execute();
           } else if (!id(wifi_id).is_connected() || !id(api_id).is_connected()){
             id(control_leds_no_ha_connection_state).execute();
-          } else if (id(user_button).state) {
-            id(control_leds_center_button_touched).execute();
           } else if (id(timer_ringing).state) {
             id(control_leds_timer_ringing).execute();
           } else if (id(voice_assistant_phase) == ${voice_assist_waiting_for_command_phase_id}) {
@@ -820,17 +891,6 @@ script:
           id: led_speaker
           effect: "Slow Pulse"
 
-  # Script executed when the center button is touched
-  # The LED turns on blue
-  - id: control_leds_center_button_touched
-    then:
-      - light.turn_on:
-          brightness: 80%
-          red: 0
-          green: 0
-          blue: 1
-          id: led_speaker
-
   # Script executed when the timer is ringing, to control the LEDs
   # The LED blinks green.
   - id: control_leds_timer_ringing
@@ -970,6 +1030,52 @@ script:
       # Enable stop wake word
       - lambda: id(stop).enable();
 
+  - id: check_alarm
+    then:
+      - lambda: |-
+          id(publish_current_time).execute();
+          // Check alarm
+          if (id(alarm_on).state && id(alarm_time).has_state()) {
+            // Get the stored alarm time from the sensor
+            auto set_alarm_time = id(alarm_time).state;
+            auto alarm_hour = std::stoi(set_alarm_time.substr(0, 2));
+            auto alarm_minute = std::stoi(set_alarm_time.substr(3, 2));
+
+            // Trigger action if current time matches alarm time
+            auto time_now = id(homeassistant_time).now();
+            if (time_now.hour == alarm_hour && time_now.minute == alarm_minute) {
+              auto action = id(alarm_action).state;
+              ESP_LOGI("time_debug", "Action: %s", action.c_str());
+              if (action == "Play sound") {
+                id(timer_ringing).turn_on();
+              } else if (action == "Send event") {
+                ESP_LOGI("time_debug", "Sending event");
+                id(send_alarm_event).execute();
+              } else if (action == "Sound and event") {
+                id(timer_ringing).turn_on();
+                id(send_alarm_event).execute();
+              } 
+            }
+          }
+  - id: send_alarm_event
+    then:
+      - homeassistant.event:
+          event: esphome.alarm_ringing
+  - id: send_tts_uri_event
+    parameters:
+      tts_uri: string
+    then:
+      - homeassistant.event:
+          event: esphome.tts_uri
+          data:
+            uri: !lambda return tts_uri;
+  - id: publish_current_time
+    then:
+      - lambda: |-
+          // Publish current time
+          auto time_now = id(homeassistant_time).now();
+          id(current_time).publish_state(time_now.strftime("%H:%M"));
+
   # Script used to go up or down in the settings menu
   - id: control_settings_menu
     parameters:
@@ -1063,7 +1169,7 @@ speaker:
 media_player:
   - platform: speaker
     id: external_media_player
-    name: None
+    name: Media Player
     internal: false
     volume_increment: 0.05
     volume_min: 0.2
@@ -1120,6 +1226,8 @@ media_player:
         file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
       - id: wake_word_triggered_sound
         file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+      - id: error_cloud_expired
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
 
 respeaker_lite:
   id: respeaker
@@ -1227,22 +1335,30 @@ micro_wake_word:
                 switch.is_on: timer_ringing
               then:
                 - switch.turn_off: timer_ringing
-              # Start voice assistant, stop current announcement.
+              # Stop voice assistant if running
               else:
                 - if:
                     condition:
-                      media_player.is_announcing:
+                      voice_assistant.is_running:
                     then:
-                      media_player.stop:
-                        announcement: true
+                      voice_assistant.stop:
+                    # Stop any other media player announcement
                     else:
-                      - script.execute:
-                          id: play_sound
-                          priority: true
-                          sound_file: !lambda return id(wake_word_triggered_sound);
-                      - delay: 300ms
-                      - voice_assistant.start:
-                          wake_word: !lambda return wake_word;
+                      - if:
+                          condition:
+                            media_player.is_announcing:
+                          then:
+                            - media_player.stop:
+                                announcement: true
+                          # Start the voice assistant and play the wake sound, if enabled
+                          else:
+                            - script.execute:
+                                id: play_sound
+                                priority: true
+                                sound_file: !lambda return id(wake_word_triggered_sound);
+                            - delay: 300ms
+                            - voice_assistant.start:
+                                wake_word: !lambda return wake_word;
 
 voice_assistant:
   id: va
@@ -1269,6 +1385,8 @@ voice_assistant:
     - lambda: id(voice_assistant_phase) = ${voice_assist_not_ready_phase_id};
     - script.execute: control_leds
   on_error:
+    # Only set the error phase if the error code is different than duplicate_wake_up_detected or stt-no-text-recognized
+    # These two are ignored for a better user experience
     - if:
         condition:
           and:
@@ -1278,6 +1396,15 @@ voice_assistant:
         then:
           - lambda: id(voice_assistant_phase) = ${voice_assist_error_phase_id};
           - script.execute: control_leds
+    # If the error code is cloud-auth-failed, serve a local audio file guiding the user.
+    - if:
+        condition:
+          - lambda: return code == "cloud-auth-failed";
+        then:
+          - script.execute:
+              id: play_sound
+              priority: true
+              sound_file: !lambda return id(error_cloud_expired);
   # When the voice assistant starts: Play a wake up sound, duck audio.
   on_start:
     - mixer_speaker.apply_ducking:
@@ -1311,7 +1438,7 @@ voice_assistant:
         duration: 1.0s
     # Stop the script that would potentially enable the stop word if the response is longer than a second
     - script.stop: activate_stop_word_if_tts_step_is_long
-    # Disable the stop word (If the tiemr is not ringing)
+    # Disable the stop word (If the timer is not ringing)
     - if:
         condition:
           switch.is_off: timer_ringing
@@ -1365,11 +1492,6 @@ button:
     id: restart_button
     name: "Restart"
     entity_category: config
-
-time:
-  - platform: homeassistant
-    id: ha_time
-    timezone: Europe/Berlin
 
 font:
   - file: fonts/Tahoma.ttf
@@ -1493,7 +1615,7 @@ display:
             icon_x += 14;
           }
 
-          it.strftime(128, 0, id(font_12), TextAlign::TOP_RIGHT, "%H:%M", id(ha_time).now());
+          it.strftime(128, 0, id(font_12), TextAlign::TOP_RIGHT, "%H:%M", id(homeassistant_time).now());
 
           if (id(current_media_type).state == "music" && (id(ha_media_player).state == "playing" || id(ha_media_player).state == "paused")) {
             if (id(ha_media_player).state == "paused") {
@@ -1535,7 +1657,7 @@ display:
 
             int position;
             if (id(ha_media_player).state == "playing") {
-              auto now = id(ha_time).utcnow();
+              auto now = id(homeassistant_time).utcnow();
               position = static_cast<int>(static_cast<long long>(id(current_song_position).state) + (((long long) now.timestamp) - ((long long) updated)));
             } else {
               position = static_cast<int>(id(current_song_position).state);
@@ -1563,9 +1685,6 @@ display:
 
           it.filled_gauge(104, 63, 22, 12, volume);
           it.printf(104, 63, id(font_8), TextAlign::BASELINE_CENTER, "%d", volume);
-      # displayed when the device is in sleep mode (no display)
-      - id: sleep_page
-        lambda: ""
       # displayed when a timer is ringing
       - id: timer_ringing_page
         lambda: |
