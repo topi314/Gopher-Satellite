@@ -84,7 +84,7 @@ logger:
   initial_level: debug
   logs:
     sensor: WARN # avoids logging debug sensor updates
-  hardware_uart: uart0 #Uncomment to see serial logs via USB connection. Comment out after debufgging - this line introduces noise on speaker...
+  # hardware_uart: uart0 #Uncomment to see serial logs via USB connection. Comment out after debufgging - this line introduces noise on speaker...
 
 select:
   - platform: logger
@@ -447,7 +447,7 @@ binary_sensor:
     attribute: shuffle
     on_state:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
 sensor:
   # The dial. Used to control volume and navigate the settings menu.
@@ -496,7 +496,7 @@ sensor:
     attribute: media_duration
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: current_song_position
@@ -504,7 +504,7 @@ sensor:
     attribute: media_position
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
 text_sensor:
   - platform: template
@@ -517,7 +517,7 @@ text_sensor:
     entity_id: ${media_player_entity_id}
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: current_song_position_updated_at
@@ -525,7 +525,7 @@ text_sensor:
     attribute: media_position_updated_at
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: current_song_title
@@ -533,7 +533,7 @@ text_sensor:
     attribute: media_title
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: current_song_artist
@@ -541,7 +541,7 @@ text_sensor:
     attribute: media_artist
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: current_media_type
@@ -549,7 +549,7 @@ text_sensor:
     attribute: media_content_type
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
   - platform: homeassistant
     id: media_player_repeat
@@ -557,7 +557,7 @@ text_sensor:
     attribute: repeat
     on_value:
       then:
-        - component.update: oled_display
+        - script.execute: update_display
 
 output:
   - platform: ledc
@@ -853,7 +853,7 @@ script:
       - sensor.rotary_encoder.set_value:
           id: dial
           value: 0
-      - component.update: oled_display
+      - script.execute: update_display
       - script.execute: control_leds
 
   # Script executed when the play/pause button is pressed
@@ -975,6 +975,11 @@ script:
             - display_menu.down: settings_menu
           else:
             - display_menu.up: settings_menu
+
+  - id: update_display
+    mode: single
+    then:
+      - component.update: oled_display
 
 i2s_audio:
   - id: i2s_output
@@ -1580,7 +1585,7 @@ graphical_display_menu:
   font: font_12
   on_redraw:
     then:
-      - component.update: oled_display
+      - script.execute: update_display
   active: false
   mode: rotary
   items:
